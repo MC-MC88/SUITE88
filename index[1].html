@@ -1,0 +1,1101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>88 Suite</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+
+<style>
+    :root {
+        --bg:        #08080d;
+        --bg-2:      #0d0d14;
+        --surface:   #101018;
+        --surface-2: #17171f;
+        --border:    #1e1e28;
+        --border-2:  #2a2a36;
+        --text:      #ececf1;
+        --text-mid:  #9a9aad;
+        --text-dim:  #5c5c6e;
+
+        /* warm side */
+        --warm:      #f59e0b;
+        --warm-2:    #fbbf24;
+        --warm-glow: rgba(245, 158, 11, 0.35);
+        --warm-dim:  rgba(245, 158, 11, 0.10);
+
+        /* cool side */
+        --cool:      #00e5c4;
+        --cool-2:    #7fe8da;
+        --cool-glow: rgba(0, 229, 196, 0.35);
+        --cool-dim:  rgba(0, 229, 196, 0.10);
+
+        --danger:    #ff4d6d;
+        --success:   #4ade80;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+        min-height: 100vh;
+        background: var(--bg);
+        color: var(--text);
+        font-family: 'JetBrains Mono', ui-monospace, monospace;
+        font-size: 14px;
+        line-height: 1.5;
+        -webkit-font-smoothing: antialiased;
+        overflow-x: hidden;
+    }
+
+    /* ambient split aura */
+    body::before {
+        content: '';
+        position: fixed;
+        inset: 0;
+        background:
+            radial-gradient(ellipse 45% 55% at 20% 50%, var(--warm-dim), transparent 70%),
+            radial-gradient(ellipse 45% 55% at 80% 50%, var(--cool-dim), transparent 70%);
+        pointer-events: none;
+        z-index: 0;
+    }
+
+    /* grid */
+    body::after {
+        content: '';
+        position: fixed;
+        inset: 0;
+        background-image:
+            linear-gradient(rgba(255,255,255,0.012) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,255,255,0.012) 1px, transparent 1px);
+        background-size: 56px 56px;
+        pointer-events: none;
+        z-index: 0;
+    }
+
+    #app {
+        position: relative;
+        z-index: 1;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 22px 24px 0;
+    }
+
+    /* ═══════════ HEADER ═══════════ */
+    .topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 4px 4px 26px;
+        flex-shrink: 0;
+    }
+
+    .brand {
+        display: flex;
+        align-items: baseline;
+        gap: 10px;
+    }
+
+    .brand-main {
+        font-family: 'Space Grotesk', sans-serif;
+        font-weight: 700;
+        font-size: 1.4rem;
+        letter-spacing: 0.18em;
+        color: var(--text);
+    }
+
+    .brand-main span {
+        background: linear-gradient(90deg, var(--warm), var(--cool));
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .brand-tag {
+        font-size: 0.55rem;
+        letter-spacing: 0.28em;
+        color: var(--text-dim);
+        text-transform: uppercase;
+        padding: 3px 8px;
+        border: 1px solid var(--border);
+        border-radius: 4px;
+    }
+
+    .status-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        font-size: 0.6rem;
+        letter-spacing: 0.16em;
+        padding: 6px 12px;
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        color: var(--text-dim);
+        text-transform: uppercase;
+        transition: all 0.3s ease;
+    }
+
+    .status-chip .led {
+        width: 6px; height: 6px;
+        border-radius: 50%;
+        background: var(--text-dim);
+        box-shadow: 0 0 6px currentColor;
+    }
+
+    .status-chip[data-state="ready"] { color: var(--success); border-color: rgba(74, 222, 128, 0.3); }
+    .status-chip[data-state="ready"] .led { background: var(--success); animation: pulse 2.2s ease-in-out infinite; }
+    .status-chip[data-state="tracking"] { color: var(--cool); border-color: var(--cool-glow); }
+    .status-chip[data-state="tracking"] .led { background: var(--cool); animation: pulse 1s ease-in-out infinite; }
+    .status-chip[data-state="error"] { color: var(--danger); border-color: rgba(255, 77, 109, 0.35); }
+
+    @keyframes pulse {
+        0%, 100% { opacity: 1; transform: scale(1); }
+        50% { opacity: 0.35; transform: scale(0.8); }
+    }
+
+    /* ═══════════ INTRO ═══════════ */
+    .intro {
+        text-align: center;
+        padding: 6px 0 30px;
+        flex-shrink: 0;
+    }
+
+    .intro h1 {
+        font-family: 'Space Grotesk', sans-serif;
+        font-weight: 600;
+        font-size: clamp(1.5rem, 4vw, 2.1rem);
+        letter-spacing: -0.015em;
+        line-height: 1.25;
+        color: var(--text);
+        margin-bottom: 10px;
+    }
+
+    .intro h1 em {
+        font-style: normal;
+        background: linear-gradient(90deg, var(--warm), var(--cool));
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .intro p {
+        font-size: 0.8rem;
+        color: var(--text-mid);
+        max-width: 520px;
+        margin: 0 auto;
+        line-height: 1.7;
+    }
+
+    /* ═══════════ CARDS ═══════════ */
+    .cards {
+        flex: 1;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        padding-bottom: 26px;
+        min-height: 0;
+    }
+
+    .card {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        padding: 28px 26px 26px;
+        border-radius: 22px;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        overflow: hidden;
+        text-decoration: none;
+        color: var(--text);
+        cursor: pointer;
+        transition:
+            transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1),
+            border-color 0.3s ease,
+            background 0.3s ease,
+            box-shadow 0.4s ease;
+        min-height: 340px;
+        isolation: isolate;
+    }
+
+    .card:hover {
+        transform: translateY(-3px);
+        border-color: var(--border-2);
+    }
+
+    /* card-specific accent */
+    .card.hand { --card-accent: var(--warm); --card-glow: var(--warm-glow); --card-dim: var(--warm-dim); }
+    .card.head { --card-accent: var(--cool); --card-glow: var(--cool-glow); --card-dim: var(--cool-dim); }
+
+    /* ambient glow behind card */
+    .card-glow {
+        position: absolute;
+        inset: -40%;
+        background: radial-gradient(circle at 50% 100%, var(--card-dim), transparent 60%);
+        opacity: 0.6;
+        z-index: -1;
+        transition: opacity 0.4s ease;
+        pointer-events: none;
+    }
+
+    .card.hover-glow .card-glow { opacity: 1; }
+
+    /* active state (when gesture is being held) */
+    .card.active {
+        transform: translateY(-4px) scale(1.012);
+        border-color: var(--card-accent);
+        box-shadow:
+            0 0 0 1px var(--card-accent),
+            0 20px 60px var(--card-glow),
+            inset 0 0 60px var(--card-dim);
+    }
+
+    .card.active .card-glow { opacity: 1; }
+
+    /* progress bar at bottom of active card */
+    .card-progress {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        height: 3px;
+        width: 0%;
+        background: var(--card-accent);
+        box-shadow: 0 0 16px var(--card-glow);
+        transition: width 0.06s linear;
+        border-radius: 0 3px 0 0;
+        pointer-events: none;
+    }
+
+    /* icon area */
+    .card-icon-wrap {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 26px;
+    }
+
+    .card-icon {
+        width: 68px;
+        height: 68px;
+        border-radius: 18px;
+        border: 1px solid var(--border-2);
+        background: var(--surface-2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--card-accent);
+        transition: all 0.4s ease;
+        position: relative;
+    }
+
+    .card.active .card-icon {
+        border-color: var(--card-accent);
+        background: var(--card-dim);
+        box-shadow: 0 0 24px var(--card-glow);
+    }
+
+    .card-icon svg { display: block; }
+
+    /* numeric badge — shows which finger count opens it */
+    .card-badge {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 4px;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.55rem;
+        letter-spacing: 0.18em;
+        color: var(--text-dim);
+        text-transform: uppercase;
+        transition: color 0.3s ease;
+    }
+
+    .card-badge-num {
+        font-family: 'Space Grotesk', sans-serif;
+        font-weight: 700;
+        font-size: 1.6rem;
+        letter-spacing: 0;
+        color: var(--text);
+        line-height: 1;
+        transition: color 0.3s ease, text-shadow 0.3s ease;
+    }
+
+    .card.active .card-badge-num {
+        color: var(--card-accent);
+        text-shadow: 0 0 18px var(--card-glow);
+    }
+
+    /* info area */
+    .card-info {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+    }
+
+    .card-name {
+        font-family: 'Space Grotesk', sans-serif;
+        font-weight: 600;
+        font-size: 1.55rem;
+        letter-spacing: -0.015em;
+        color: var(--text);
+        line-height: 1.15;
+        margin-bottom: 4px;
+    }
+
+    .card-name .card-name-suffix {
+        display: block;
+        font-size: 0.75rem;
+        font-weight: 500;
+        letter-spacing: 0.22em;
+        text-transform: uppercase;
+        color: var(--card-accent);
+        margin-bottom: 2px;
+        opacity: 0.9;
+    }
+
+    .card-desc {
+        font-size: 0.74rem;
+        color: var(--text-mid);
+        line-height: 1.65;
+        margin-top: 12px;
+        margin-bottom: 16px;
+        max-width: 340px;
+    }
+
+    .card-features {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        padding-top: 14px;
+        border-top: 1px solid var(--border);
+        transition: border-color 0.3s ease;
+    }
+
+    .card.active .card-features { border-color: var(--border-2); }
+
+    .feature-tag {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.58rem;
+        letter-spacing: 0.08em;
+        padding: 3px 8px;
+        border-radius: 5px;
+        border: 1px solid var(--border);
+        color: var(--text-mid);
+        background: var(--bg-2);
+        text-transform: uppercase;
+        transition: all 0.3s ease;
+    }
+
+    .card.active .feature-tag {
+        border-color: var(--card-accent);
+        color: var(--card-accent);
+        background: var(--card-dim);
+    }
+
+    /* ═══════════ FOOTER ═══════════ */
+    .footbar {
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 18px 4px 22px;
+        border-top: 1px solid var(--border);
+        gap: 12px;
+    }
+
+    .foot-hint {
+        font-size: 0.66rem;
+        color: var(--text-dim);
+        letter-spacing: 0.04em;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        line-height: 1.5;
+    }
+
+    .foot-hint .sep {
+        color: var(--border-2);
+    }
+
+    .foot-hint b {
+        color: var(--text-mid);
+        font-weight: 500;
+    }
+
+    .foot-copy {
+        font-size: 0.58rem;
+        color: var(--text-dim);
+        letter-spacing: 0.1em;
+        white-space: nowrap;
+    }
+
+    /* ═══════════ TOAST ═══════════ */
+    .toast {
+        position: fixed;
+        top: 22px;
+        left: 50%;
+        transform: translateX(-50%) translateY(-14px);
+        background: var(--surface-2);
+        border: 1px solid var(--border-2);
+        border-radius: 10px;
+        padding: 10px 16px;
+        font-size: 0.7rem;
+        letter-spacing: 0.04em;
+        color: var(--text);
+        z-index: 500;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.25s ease, transform 0.25s ease;
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        box-shadow: 0 14px 44px rgba(0, 0, 0, 0.55);
+        max-width: 90vw;
+    }
+
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    .toast .t-icon { color: var(--cool); font-size: 0.85rem; }
+    .toast.warn .t-icon { color: var(--danger); }
+
+    /* ═══════════ OVERLAY ═══════════ */
+    .overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(8, 8, 13, 0.94);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        z-index: 1000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 22px;
+        transition: opacity 0.4s ease;
+    }
+
+    .overlay.hide { display: none; }
+
+    .panel {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 22px;
+        padding: 32px 28px 26px;
+        max-width: 440px;
+        width: 100%;
+        box-shadow: 0 40px 120px rgba(0, 0, 0, 0.65);
+    }
+
+    .panel-mark {
+        font-family: 'Space Grotesk', sans-serif;
+        font-weight: 700;
+        font-size: 0.7rem;
+        letter-spacing: 0.32em;
+        color: var(--cool);
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .panel-mark::after {
+        content: '';
+        flex: 1;
+        height: 1px;
+        background: linear-gradient(90deg, var(--cool-glow), transparent);
+    }
+
+    .panel h2 {
+        font-family: 'Space Grotesk', sans-serif;
+        font-weight: 600;
+        font-size: 1.22rem;
+        letter-spacing: -0.01em;
+        color: var(--text);
+        margin-bottom: 10px;
+        line-height: 1.32;
+    }
+
+    .panel .lede {
+        font-size: 0.76rem;
+        color: var(--text-mid);
+        line-height: 1.65;
+        margin-bottom: 22px;
+    }
+
+    .guide-list {
+        display: flex;
+        flex-direction: column;
+        gap: 9px;
+        margin-bottom: 22px;
+    }
+
+    .guide-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 11px 13px;
+        background: var(--surface-2);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        font-size: 0.72rem;
+    }
+
+    .guide-icon {
+        font-size: 1.05rem;
+        width: 26px;
+        text-align: center;
+        flex-shrink: 0;
+    }
+
+    .guide-text { color: var(--text-mid); line-height: 1.4; }
+    .guide-text b { color: var(--text); font-weight: 500; }
+
+    .cta {
+        width: 100%;
+        background: var(--text);
+        color: var(--bg);
+        border: none;
+        font-family: 'Space Grotesk', sans-serif;
+        font-weight: 600;
+        font-size: 0.78rem;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        padding: 14px;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .cta:hover:not(:disabled) {
+        background: var(--cool);
+        color: var(--bg);
+        box-shadow: 0 0 28px var(--cool-glow);
+    }
+
+    .cta:disabled { opacity: 0.5; cursor: wait; }
+
+    .cta-skip {
+        display: block;
+        width: 100%;
+        background: transparent;
+        border: none;
+        color: var(--text-dim);
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.68rem;
+        letter-spacing: 0.08em;
+        padding: 12px 6px 2px;
+        cursor: pointer;
+        text-align: center;
+        transition: color 0.2s ease;
+    }
+
+    .cta-skip:hover { color: var(--text-mid); }
+
+    .error-line {
+        display: none;
+        padding: 10px 12px;
+        background: rgba(255, 77, 109, 0.10);
+        border: 1px solid rgba(255, 77, 109, 0.35);
+        border-radius: 9px;
+        color: #ff8a9c;
+        font-size: 0.68rem;
+        line-height: 1.55;
+        margin-bottom: 16px;
+    }
+
+    .error-line.show { display: block; }
+
+    /* ═══════════ RESPONSIVE ═══════════ */
+    @media (max-width: 760px) {
+        #app { padding: 18px 16px 0; }
+        .brand-main { font-size: 1.15rem; letter-spacing: 0.14em; }
+        .brand-tag { font-size: 0.5rem; padding: 2px 6px; letter-spacing: 0.2em; }
+        .status-chip { font-size: 0.55rem; padding: 5px 9px; letter-spacing: 0.12em; }
+
+        .intro { padding: 2px 0 20px; }
+        .intro p { font-size: 0.72rem; padding: 0 10px; }
+
+        .cards {
+            grid-template-columns: 1fr;
+            gap: 14px;
+            padding-bottom: 20px;
+        }
+
+        .card {
+            min-height: 220px;
+            padding: 20px 20px 18px;
+            border-radius: 18px;
+        }
+
+        .card-icon { width: 54px; height: 54px; border-radius: 14px; }
+        .card-icon svg { width: 26px; height: 26px; }
+        .card-icon-wrap { margin-bottom: 18px; }
+        .card-badge-num { font-size: 1.35rem; }
+
+        .card-name { font-size: 1.25rem; }
+        .card-desc { font-size: 0.68rem; margin-top: 8px; margin-bottom: 12px; }
+        .feature-tag { font-size: 0.54rem; padding: 2px 6px; }
+
+        .footbar {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 8px;
+            padding: 14px 4px 18px;
+        }
+        .foot-copy { font-size: 0.5rem; }
+        .foot-hint { font-size: 0.6rem; flex-wrap: wrap; gap: 6px; }
+    }
+
+    @media (max-width: 400px) {
+        .card { min-height: 200px; }
+        .card-desc { display: none; }
+    }
+
+    .vh {
+        position: absolute;
+        width: 1px; height: 1px;
+        margin: -1px; padding: 0;
+        overflow: hidden;
+        clip: rect(0,0,0,0);
+        border: 0;
+    }
+</style>
+</head>
+<body>
+
+<div id="app">
+
+    <header class="topbar">
+        <div class="brand">
+            <div class="brand-main">8<span>8</span></div>
+            <div class="brand-tag">suite</div>
+        </div>
+        <div class="status-chip" id="statusChip" data-state="boot">
+            <span class="led"></span>
+            <span id="statusText">booting</span>
+        </div>
+    </header>
+
+    <section class="intro">
+        <h1>Two ways to speak.<br>One <em>voice</em>.</h1>
+        <p>Choose with a gesture, or just tap a card. Both apps run entirely in your browser — nothing is uploaded anywhere.</p>
+    </section>
+
+    <main class="cards">
+
+        <!-- ═══ HAND ═══ -->
+        <a class="card hand" id="cardHand" href="vocal88.html" data-gesture="ONE">
+            <div class="card-glow"></div>
+            <div class="card-progress" id="progHand"></div>
+
+            <div class="card-icon-wrap">
+                <div class="card-icon">
+                    <!-- open palm -->
+                    <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M18 11V6a1.5 1.5 0 0 0-3 0v5"/>
+                        <path d="M15 10V4a1.5 1.5 0 0 0-3 0v6"/>
+                        <path d="M12 10V5a1.5 1.5 0 0 0-3 0v7"/>
+                        <path d="M9 12V7a1.5 1.5 0 0 0-3 0v9"/>
+                        <path d="M6 13v6a4 4 0 0 0 4 4h4a6 6 0 0 0 6-6v-4"/>
+                    </svg>
+                </div>
+                <div class="card-badge">
+                    <span>finger</span>
+                    <span class="card-badge-num">1</span>
+                </div>
+            </div>
+
+            <div class="card-info">
+                <div class="card-name">
+                    <span class="card-name-suffix">Hand gestures</span>
+                    Vocal88
+                </div>
+                <div class="card-desc">Record voice notes with open palm, fist, rock and shaka. Perfect for when your hands are busy or you prefer touchless control.</div>
+                <div class="card-features">
+                    <span class="feature-tag">record</span>
+                    <span class="feature-tag">mp3</span>
+                    <span class="feature-tag">share</span>
+                    <span class="feature-tag">download</span>
+                </div>
+            </div>
+        </a>
+
+        <!-- ═══ HEAD ═══ -->
+        <a class="card head" id="cardHead" href="vocal88HeadEdition.html" data-gesture="TWO">
+            <div class="card-glow"></div>
+            <div class="card-progress" id="progHead"></div>
+
+            <div class="card-icon-wrap">
+                <div class="card-icon">
+                    <!-- stylized head silhouette -->
+                    <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 2a7 7 0 0 0-7 7v2a7 7 0 0 0 3 5.7V21h8v-4.3A7 7 0 0 0 19 11V9a7 7 0 0 0-7-7z"/>
+                        <circle cx="9" cy="10" r="0.9" fill="currentColor" stroke="none"/>
+                        <circle cx="15" cy="10" r="0.9" fill="currentColor" stroke="none"/>
+                        <path d="M10 14.5c.6.6 1.4 1 2 1s1.4-.4 2-1"/>
+                    </svg>
+                </div>
+                <div class="card-badge">
+                    <span>fingers</span>
+                    <span class="card-badge-num">2</span>
+                </div>
+            </div>
+
+            <div class="card-info">
+                <div class="card-name">
+                    <span class="card-name-suffix">Head gestures</span>
+                    Vocal88 Head
+                </div>
+                <div class="card-desc">Turn right to record, turn left to download. Four gestures only — made for hands-free, accessible recording.</div>
+                <div class="card-features">
+                    <span class="feature-tag">head</span>
+                    <span class="feature-tag">auto mp3</span>
+                    <span class="feature-tag">themes</span>
+                    <span class="feature-tag">shake clear</span>
+                </div>
+            </div>
+        </a>
+
+    </main>
+
+    <footer class="footbar">
+        <div class="foot-hint">
+            <span><b>1 finger</b> → Hand</span>
+            <span class="sep">·</span>
+            <span><b>2 fingers</b> → Head</span>
+        </div>
+        <div class="foot-copy">mohamed005cheikh@gmail.com · MC88</div>
+    </footer>
+
+</div>
+
+<video id="cam" autoplay playsinline muted class="vh"></video>
+
+<div class="toast" id="toast">
+    <span class="t-icon" id="toastIcon">✓</span>
+    <span id="toastText">ok</span>
+</div>
+
+<div class="overlay" id="overlay">
+    <div class="panel">
+        <div class="panel-mark">88 SUITE</div>
+        <h2>Two apps, one gesture.</h2>
+        <p class="lede">Point your hand at the camera. Raise one finger to open the hand edition, or two to open the head edition. You can also just tap either card.</p>
+
+        <div class="error-line" id="errLine"></div>
+
+        <div class="guide-list">
+            <div class="guide-row">
+                <span class="guide-icon">☝️</span>
+                <span class="guide-text">One finger — open <b>Vocal88</b></span>
+            </div>
+            <div class="guide-row">
+                <span class="guide-icon">✌️</span>
+                <span class="guide-text">Two fingers — open <b>Vocal88 Head</b></span>
+            </div>
+        </div>
+
+        <button class="cta" id="enterBtn">Enable camera</button>
+        <button class="cta-skip" id="skipBtn">Skip — tap cards instead</button>
+    </div>
+</div>
+
+<script type="module">
+import { HandLandmarker, FilesetResolver } from
+    'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/+esm';
+
+/* ─────────────────────────────────── */
+const statusChip   = document.getElementById('statusChip');
+const statusText   = document.getElementById('statusText');
+const cardHand     = document.getElementById('cardHand');
+const cardHead     = document.getElementById('cardHead');
+const progHand     = document.getElementById('progHand');
+const progHead     = document.getElementById('progHead');
+const camVideo     = document.getElementById('cam');
+const overlay      = document.getElementById('overlay');
+const enterBtn     = document.getElementById('enterBtn');
+const skipBtn      = document.getElementById('skipBtn');
+const errLine      = document.getElementById('errLine');
+const toastEl      = document.getElementById('toast');
+const toastIcon    = document.getElementById('toastIcon');
+const toastText    = document.getElementById('toastText');
+
+/* ─────────────────────────────────── */
+const HOLD_MS = 900;
+const STABLE_FRAMES = 3;
+const LOCK_MS = 400;
+const COOLDOWN_MS = 1500;
+
+const state = {
+    ready: false,
+    active: false,
+    candidate: null,
+    candidateCount: 0,
+    holdStart: 0,
+    locked: false,
+    navigating: false,
+};
+
+let lastTickBucket = -1;
+
+/* ─────────────────────────────────── */
+let actx = null;
+function ensureAudio() {
+    if (actx) return;
+    try { actx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) {}
+}
+function ping(freq, dur, vol, delay = 0, type = 'sine') {
+    if (!actx) return;
+    const t = actx.currentTime + delay;
+    const o = actx.createOscillator();
+    const g = actx.createGain();
+    o.type = type;
+    o.frequency.setValueAtTime(freq, t);
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(vol, t + 0.005);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    o.connect(g); g.connect(actx.destination);
+    o.start(t); o.stop(t + dur + 0.02);
+}
+const sfx = {
+    ready:    () => { ping(660, 0.06, 0.035); ping(880, 0.08, 0.03, 0.06); ping(1174, 0.1, 0.03, 0.13); },
+    tick:     (p) => { ping(1100 + p * 1400, 0.014, 0.012); },
+    fire:     () => { ping(1318, 0.07, 0.04); ping(1760, 0.1, 0.035, 0.05); },
+    cancel:   () => { ping(440, 0.05, 0.028, 0, 'square'); ping(330, 0.07, 0.025, 0.04, 'square'); },
+    error:    () => { ping(220, 0.14, 0.05, 0, 'square'); ping(147, 0.18, 0.04, 0.1, 'square'); },
+    hand:     () => { ping(659, 0.06, 0.035); ping(988, 0.1, 0.03, 0.06); },
+    head:     () => { ping(880, 0.06, 0.035); ping(1174, 0.1, 0.03, 0.06); },
+};
+
+/* ─────────────────────────────────── */
+function setStatus(text, mode) {
+    statusText.textContent = text;
+    statusChip.dataset.state = mode;
+}
+
+let toastTO = null;
+function toast(text, icon = '✓', warn = false, dur = 1800) {
+    toastIcon.textContent = icon;
+    toastText.textContent = text;
+    toastEl.classList.toggle('warn', warn);
+    toastEl.classList.add('show');
+    clearTimeout(toastTO);
+    toastTO = setTimeout(() => toastEl.classList.remove('show'), dur);
+}
+
+/* ─────────────────────────────────── */
+/* finger detection */
+function fingerExtended(hand, tipIdx, pipIdx) {
+    const wrist = hand[0];
+    const tipD = Math.hypot(hand[tipIdx].x - wrist.x, hand[tipIdx].y - wrist.y);
+    const pipD = Math.hypot(hand[pipIdx].x - wrist.x, hand[pipIdx].y - wrist.y);
+    return tipD > pipD * 1.08;
+}
+
+function detectGesture(hand) {
+    const idx  = fingerExtended(hand, 8, 6);
+    const mid  = fingerExtended(hand, 12, 10);
+    const ring = fingerExtended(hand, 16, 14);
+    const pink = fingerExtended(hand, 20, 18);
+
+    // ONE: index only
+    if (idx && !mid && !ring && !pink) return 'ONE';
+    // TWO: index + middle
+    if (idx && mid && !ring && !pink) return 'TWO';
+    return null;
+}
+
+/* ─────────────────────────────────── */
+function highlightCard(g) {
+    cardHand.classList.toggle('active', g === 'ONE');
+    cardHead.classList.toggle('active', g === 'TWO');
+    progHand.style.width = '0%';
+    progHead.style.width = '0%';
+}
+
+function clearHighlight() {
+    cardHand.classList.remove('active');
+    cardHead.classList.remove('active');
+    progHand.style.width = '0%';
+    progHead.style.width = '0%';
+    lastTickBucket = -1;
+}
+
+/* ─────────────────────────────────── */
+function processHand(result, now) {
+    if (!result.landmarks || result.landmarks.length === 0) {
+        state.active = false;
+        state.candidate = null;
+        state.candidateCount = 0;
+        clearHighlight();
+        return;
+    }
+    state.active = true;
+
+    const hand = result.landmarks[0];
+    const raw = detectGesture(hand);
+
+    if (raw === state.candidate) state.candidateCount++;
+    else { state.candidate = raw; state.candidateCount = 1; }
+
+    const stable = state.candidateCount >= STABLE_FRAMES ? raw : null;
+
+    if (state.locked || state.navigating) {
+        clearHighlight();
+        return;
+    }
+
+    if (stable !== (state.currentStable || null)) {
+        state.currentStable = stable;
+        state.holdStart = now;
+        lastTickBucket = -1;
+        highlightCard(stable);
+    }
+
+    if (stable) {
+        const p = Math.min(1, (now - state.holdStart) / HOLD_MS);
+        const bucket = Math.floor(p * 10);
+        if (bucket !== lastTickBucket && p < 1) {
+            lastTickBucket = bucket;
+            sfx.tick(p);
+        }
+
+        if (stable === 'ONE') progHand.style.width = (p * 100) + '%';
+        if (stable === 'TWO') progHead.style.width = (p * 100) + '%';
+
+        if (p >= 1) fire(stable);
+    } else {
+        // reset progress bars when gesture is lost mid-hold
+        progHand.style.width = '0%';
+        progHead.style.width = '0%';
+    }
+}
+
+function fire(g) {
+    if (state.navigating) return;
+    state.navigating = true;
+    state.locked = true;
+    sfx.fire();
+
+    let url = '';
+    if (g === 'ONE') { url = 'vocal88.html'; sfx.hand(); toast('Opening Vocal88', '✋'); }
+    if (g === 'TWO') { url = 'vocal88HeadEdition.html'; sfx.head(); toast('Opening Vocal88 Head', '◐'); }
+
+    if (!url) return;
+
+    // give the sound a moment to play
+    setTimeout(() => { window.location.href = url; }, 350);
+}
+
+/* ─────────────────────────────────── */
+let handLandmarker = null;
+let lastVideoTime = -1;
+let lastDetectTime = 0;
+const DETECT_INTERVAL = 33;
+let loopRunning = false;
+
+function loop() {
+    requestAnimationFrame(loop);
+    if (!loopRunning) return;
+
+    const now = performance.now();
+    if (now - lastDetectTime < DETECT_INTERVAL) return;
+    lastDetectTime = now;
+
+    if (camVideo.readyState < 2) return;
+    if (camVideo.currentTime === lastVideoTime) return;
+    lastVideoTime = camVideo.currentTime;
+
+    try {
+        const r = handLandmarker.detectForVideo(camVideo, now);
+        processHand(r, now);
+
+        if (r.landmarks && r.landmarks.length > 0) {
+            setStatus('tracking', 'tracking');
+        } else {
+            setStatus('ready', 'ready');
+        }
+    } catch (e) { /* skip frame */ }
+}
+
+/* ─────────────────────────────────── */
+async function init() {
+    try {
+        setStatus('loading model', 'boot');
+        enterBtn.textContent = 'Loading model…';
+
+        const vision = await FilesetResolver.forVisionTasks(
+            'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/wasm'
+        );
+
+        handLandmarker = await HandLandmarker.createFromOptions(vision, {
+            baseOptions: {
+                modelAssetPath: 'https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task',
+                delegate: 'GPU',
+            },
+            runningMode: 'VIDEO',
+            numHands: 1,
+        });
+
+        setStatus('requesting camera', 'boot');
+        enterBtn.textContent = 'Waiting for camera…';
+
+        const stream = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: 'user', width: 640, height: 480 },
+        });
+        camVideo.srcObject = stream;
+        await camVideo.play();
+
+        state.ready = true;
+        loopRunning = true;
+        overlay.classList.add('hide');
+        setStatus('ready', 'ready');
+        sfx.ready();
+        toast('Ready · raise a hand', '✓', false, 2400);
+    } catch (err) {
+        console.error(err);
+        let msg = 'Could not start: ' + (err.name || 'error');
+        if (err.name === 'NotAllowedError') msg = 'Camera permission was denied. Enable it and reload, or just tap a card below.';
+        else if (err.name === 'NotFoundError') msg = 'No camera found on this device. Tap a card instead.';
+        else if (err.name === 'NotReadableError') msg = 'Camera is in use by another app. Tap a card instead.';
+        else if (err.message) msg = err.message;
+
+        errLine.textContent = msg;
+        errLine.classList.add('show');
+        enterBtn.disabled = false;
+        enterBtn.textContent = 'Retry';
+        setStatus('error', 'error');
+        sfx.error();
+    }
+}
+
+/* ─────────────────────────────────── */
+enterBtn.addEventListener('click', () => {
+    ensureAudio();
+    enterBtn.disabled = true;
+    errLine.classList.remove('show');
+    init();
+});
+
+skipBtn.addEventListener('click', () => {
+    overlay.classList.add('hide');
+    setStatus('manual', 'boot');
+});
+
+/* quiet hover glow */
+[cardHand, cardHead].forEach(c => {
+    c.addEventListener('mouseenter', () => c.classList.add('hover-glow'));
+    c.addEventListener('mouseleave', () => c.classList.remove('hover-glow'));
+});
+
+/* boot */
+setStatus('awaiting', 'boot');
+loop();
+</script>
+
+</body>
+</html>

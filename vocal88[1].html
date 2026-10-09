@@ -1,0 +1,1745 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>vocal88</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=Inter:wght@300;400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+    body.theme-sunset {
+        --bg: #1a0e07;
+        --bg-grad-1: #2a1408;
+        --bg-grad-2: #140803;
+        --panel: #23130a;
+        --panel-border: #3d2014;
+        --card: #2e1a0e;
+        --card-hover: #3d2416;
+        --card-selected: #4a2c1a;
+        --accent: #f59e0b;
+        --accent-bright: #fbbf24;
+        --accent-glow: rgba(245, 158, 11, 0.35);
+        --text: #fef3c7;
+        --text-mid: #d4a574;
+        --text-dim: #8a6a45;
+        --danger: #ef4444;
+        --danger-glow: rgba(239, 68, 68, 0.35);
+        --success: #10b981;
+        --shadow: 0 4px 24px rgba(0, 0, 0, 0.55);
+    }
+
+    body.theme-tropical {
+        --bg: #f0e5c2;
+        --bg-grad-1: #f5ecd0;
+        --bg-grad-2: #e8dcb4;
+        --panel: #faf3da;
+        --panel-border: #d4c69a;
+        --card: #ffffff;
+        --card-hover: #f7efd3;
+        --card-selected: #e8f0e8;
+        --accent: #1e5670;
+        --accent-bright: #2d7a9c;
+        --accent-glow: rgba(30, 86, 112, 0.25);
+        --text: #2a1f14;
+        --text-mid: #5a4a34;
+        --text-dim: #8a7a62;
+        --danger: #c0392b;
+        --danger-glow: rgba(192, 57, 43, 0.25);
+        --success: #1f5c3d;
+        --shadow: 0 4px 24px rgba(60, 40, 20, 0.15);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+        min-height: 100vh;
+        font-family: 'Inter', -apple-system, sans-serif;
+        color: var(--text);
+        background: linear-gradient(180deg, var(--bg-grad-1) 0%, var(--bg-grad-2) 100%);
+        background-attachment: fixed;
+        -webkit-font-smoothing: antialiased;
+        overflow-x: hidden;
+    }
+
+    header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 18px 28px;
+        background: var(--panel);
+        border-bottom: 1px solid var(--panel-border);
+        position: sticky;
+        top: 0;
+        z-index: 30;
+    }
+
+    .logo {
+        font-family: 'Sora', sans-serif;
+        font-weight: 700;
+        font-size: 1.4rem;
+        letter-spacing: -0.02em;
+        color: var(--text);
+    }
+
+    .logo-text span { color: var(--accent); }
+
+    .header-right { display: flex; align-items: center; gap: 14px; }
+
+    .status-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.7rem;
+        letter-spacing: 0.12em;
+        padding: 7px 14px;
+        border-radius: 999px;
+        background: rgba(16, 185, 129, 0.12);
+        border: 1px solid rgba(16, 185, 129, 0.3);
+        color: var(--success);
+        text-transform: uppercase;
+        white-space: nowrap;
+    }
+
+    .status-pill.recording { background: rgba(239, 68, 68, 0.14); border-color: rgba(239, 68, 68, 0.4); color: var(--danger); }
+    .status-pill.playing { background: var(--accent-glow); border-color: var(--accent); color: var(--accent); }
+    .status-pill.error { background: rgba(239, 68, 68, 0.2); border-color: var(--danger); color: var(--danger); }
+    .status-pill.sharing { background: var(--accent-glow); border-color: var(--accent); color: var(--accent); }
+    .status-pill.downloading { background: rgba(16, 185, 129, 0.18); border-color: var(--success); color: var(--success); }
+    .status-pill.converting { background: rgba(139, 92, 246, 0.18); border-color: #8b5cf6; color: #c4b5fd; }
+
+    .status-dot {
+        width: 7px; height: 7px;
+        border-radius: 50%;
+        background: currentColor;
+        box-shadow: 0 0 8px currentColor;
+    }
+
+    .theme-toggle {
+        display: flex;
+        background: var(--card);
+        border: 1px solid var(--panel-border);
+        border-radius: 999px;
+        padding: 3px;
+        gap: 2px;
+    }
+
+    .theme-btn {
+        background: transparent;
+        border: none;
+        width: 34px; height: 30px;
+        border-radius: 999px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--text);
+        opacity: 0.5;
+        transition: opacity 0.2s ease;
+    }
+
+    .theme-btn:hover { opacity: 0.85; }
+    .theme-btn.active { background: var(--accent); opacity: 1; color: var(--bg); }
+    .theme-btn svg { display: block; }
+
+    main {
+        display: grid;
+        grid-template-columns: 340px 1fr;
+        gap: 22px;
+        padding: 22px 28px 0;
+        max-width: 1240px;
+        margin: 0 auto;
+        min-height: calc(100vh - 170px);
+    }
+
+    .gesture-panel {
+        background: var(--panel);
+        border: 1px solid var(--panel-border);
+        border-radius: 18px;
+        padding: 26px 22px;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        overflow: hidden;
+        box-shadow: var(--shadow);
+    }
+
+    .hold-bar {
+        position: absolute;
+        top: 0; left: 0;
+        height: 3px;
+        width: 0%;
+        background: var(--accent);
+        box-shadow: 0 0 14px var(--accent-glow);
+        transition: width 0.08s linear;
+    }
+
+    .gesture-display {
+        text-align: center;
+        padding: 8px 0 18px;
+        border-bottom: 1px solid var(--panel-border);
+    }
+
+    .gesture-emoji {
+        font-size: 4.2rem;
+        line-height: 1;
+        margin-bottom: 14px;
+        display: inline-block;
+    }
+
+    .gesture-name {
+        font-family: 'Sora', sans-serif;
+        font-weight: 600;
+        font-size: 1.05rem;
+        letter-spacing: 0.02em;
+        color: var(--text);
+        min-height: 1.3em;
+        margin-bottom: 6px;
+    }
+
+    .gesture-hint {
+        font-size: 0.78rem;
+        color: var(--text-dim);
+        line-height: 1.55;
+        min-height: 2.4em;
+        padding: 0 8px;
+    }
+
+    .recording-timer {
+        margin-top: 20px;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 2.2rem;
+        color: var(--danger);
+        text-shadow: 0 0 22px var(--danger-glow);
+        display: none;
+    }
+
+    .recording-timer.active { display: block; }
+
+    .guide { padding: 20px 4px 0; flex: 1; }
+
+    .guide-title {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.68rem;
+        letter-spacing: 0.22em;
+        color: var(--text-dim);
+        text-transform: uppercase;
+        margin-bottom: 14px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .guide-title::after { content: ""; flex: 1; height: 1px; background: var(--panel-border); }
+
+    .guide-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 8px 10px;
+        border-radius: 10px;
+        margin-bottom: 3px;
+        border: 1px solid transparent;
+        cursor: pointer;
+    }
+
+    .guide-row.active { background: var(--accent-glow); border-color: var(--accent); }
+
+    .guide-emoji { font-size: 1.35rem; width: 30px; text-align: center; }
+    .guide-text { font-size: 0.78rem; color: var(--text-mid); }
+    .guide-row.active .guide-text { color: var(--text); }
+
+    .guide-count {
+        margin-left: auto;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.68rem;
+        color: var(--text-dim);
+        padding: 2px 7px;
+        border-radius: 5px;
+        background: var(--card);
+    }
+
+    .guide-row.active .guide-count { background: var(--accent); color: var(--bg); }
+
+    .guide-divider {
+        height: 1px;
+        background: var(--panel-border);
+        margin: 12px 4px 10px;
+        opacity: 0.7;
+    }
+
+    .guide-subtitle {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.62rem;
+        letter-spacing: 0.22em;
+        color: var(--text-dim);
+        text-transform: uppercase;
+        margin-bottom: 8px;
+        padding: 0 4px;
+    }
+
+    .notes-panel {
+        background: var(--panel);
+        border: 1px solid var(--panel-border);
+        border-radius: 18px;
+        padding: 22px;
+        display: flex;
+        flex-direction: column;
+        box-shadow: var(--shadow);
+        min-width: 0;
+    }
+
+    .notes-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding-bottom: 16px;
+        border-bottom: 1px solid var(--panel-border);
+        margin-bottom: 16px;
+        gap: 12px;
+    }
+
+    .notes-header h2 {
+        font-family: 'Sora', sans-serif;
+        font-weight: 600;
+        font-size: 1.05rem;
+        color: var(--text);
+        white-space: nowrap;
+    }
+
+    .notes-nav { display: flex; align-items: center; gap: 8px; }
+
+    .nav-btn {
+        width: 30px; height: 30px;
+        border-radius: 9px;
+        background: var(--card);
+        border: 1px solid var(--panel-border);
+        color: var(--text-mid);
+        font-size: 1rem;
+        cursor: pointer;
+    }
+
+    .notes-count-badge {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.7rem;
+        padding: 4px 11px;
+        border-radius: 999px;
+        background: var(--accent-glow);
+        color: var(--accent);
+        border: 1px solid var(--accent);
+        min-width: 34px;
+        text-align: center;
+    }
+
+    .notes-list {
+        display: flex;
+        flex-direction: row;
+        gap: 12px;
+        overflow-x: auto;
+        overflow-y: hidden;
+        flex: 1;
+        padding: 8px 4px 16px;
+        scroll-snap-type: x mandatory;
+        scroll-behavior: smooth;
+        min-height: 220px;
+    }
+
+    .empty-state {
+        flex: 1 0 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        color: var(--text-dim);
+        font-size: 0.85rem;
+        line-height: 1.8;
+        padding: 40px 20px;
+    }
+
+    .empty-state .big-emoji { font-size: 2.4rem; display: block; margin-bottom: 12px; opacity: 0.55; }
+
+    .note-item {
+        flex: 0 0 auto;
+        width: 188px;
+        scroll-snap-align: center;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        background: var(--card);
+        border-radius: 16px;
+        padding: 14px;
+        border: 1px solid transparent;
+        cursor: pointer;
+    }
+
+    .note-item.selected { border-color: var(--accent); background: var(--card-selected); box-shadow: 0 0 0 1px var(--accent); }
+    .note-item.playing { border-color: var(--danger); }
+
+    .note-head { display: flex; align-items: center; justify-content: space-between; }
+
+    .note-play {
+        width: 40px; height: 40px;
+        border-radius: 50%;
+        background: var(--accent-glow);
+        border: 1.5px solid var(--accent);
+        color: var(--accent);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.85rem;
+        cursor: pointer;
+        padding-left: 3px;
+    }
+
+    .note-item.playing .note-play { background: var(--danger); border-color: var(--danger); color: #fff; padding-left: 0; }
+
+    .note-actions { display: flex; gap: 4px; }
+
+    .note-download,
+    .note-share {
+        background: transparent;
+        border: 1px solid var(--panel-border);
+        color: var(--text-mid);
+        width: 28px;
+        height: 28px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 0.8rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+    }
+
+    .note-download:hover,
+    .note-share:hover {
+        border-color: var(--accent);
+        color: var(--accent);
+        background: var(--accent-glow);
+    }
+
+    .note-delete {
+        background: transparent;
+        border: none;
+        color: var(--text-dim);
+        font-size: 0.95rem;
+        cursor: pointer;
+        padding: 6px 8px;
+        opacity: 0.5;
+    }
+
+    .note-wave { display: flex; align-items: flex-end; gap: 2px; height: 54px; }
+    .note-wave span { flex: 1; min-width: 2px; background: var(--text-dim); border-radius: 2px; opacity: 0.45; }
+    .note-item.selected .note-wave span { background: var(--accent); opacity: 0.8; }
+    .note-item.playing .note-wave span { background: var(--danger); opacity: 0.9; }
+
+    .note-meta {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.66rem;
+        color: var(--text-dim);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .hand-preview {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        width: 200px;
+        height: 150px;
+        border-radius: 14px;
+        border: 2px solid var(--panel-border);
+        background: var(--card);
+        z-index: 100;
+        opacity: 0.92;
+        overflow: hidden;
+    }
+
+    #handCanvas { width: 100%; height: 100%; display: block; }
+
+    .hand-preview-label {
+        position: absolute;
+        bottom: 6px;
+        left: 10px;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.5rem;
+        letter-spacing: 0.18em;
+        color: var(--text-dim);
+        text-transform: uppercase;
+        pointer-events: none;
+    }
+
+    .toast {
+        position: fixed;
+        top: 80px;
+        left: 50%;
+        transform: translateX(-50%) translateY(-20px);
+        background: var(--panel);
+        border: 1px solid var(--accent);
+        color: var(--text);
+        padding: 12px 24px;
+        border-radius: 12px;
+        font-size: 0.85rem;
+        font-family: 'Inter', sans-serif;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.3), 0 0 20px var(--accent-glow);
+        z-index: 2500;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.25s ease, transform 0.25s ease;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        max-width: 90vw;
+    }
+
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    .toast .toast-icon { font-size: 1.15rem; }
+
+    .privacy-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.9);
+        backdrop-filter: blur(16px);
+        z-index: 3000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+    }
+
+    .privacy-card {
+        background: var(--panel);
+        border: 1px solid var(--panel-border);
+        border-radius: 24px;
+        padding: 36px 32px 28px;
+        max-width: 460px;
+        width: 100%;
+        box-shadow: 0 30px 100px rgba(0, 0, 0, 0.5);
+        line-height: 1.7;
+        color: var(--text);
+    }
+
+    .privacy-icon {
+        width: 56px;
+        height: 56px;
+        border-radius: 50%;
+        border: 1.5px solid var(--accent);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.4rem;
+        margin: 0 auto 22px;
+        color: var(--accent);
+    }
+
+    .privacy-card h2 {
+        font-family: 'Sora', sans-serif;
+        font-weight: 600;
+        font-size: 1.3rem;
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .privacy-card ul { list-style: none; margin-bottom: 24px; }
+
+    .privacy-card li {
+        padding: 9px 0 9px 26px;
+        position: relative;
+        opacity: 0.75;
+        border-bottom: 1px solid var(--panel-border);
+        font-size: 0.88rem;
+        font-weight: 300;
+    }
+
+    .privacy-card li:last-child { border-bottom: none; }
+    .privacy-card li::before { content: "—"; position: absolute; left: 0; color: var(--accent); }
+    .privacy-card .hl { font-weight: 600; opacity: 1; }
+
+    .privacy-card button {
+        width: 100%;
+        background: var(--accent);
+        color: var(--bg);
+        border: none;
+        font-family: 'Inter', sans-serif;
+        font-weight: 600;
+        font-size: 0.8rem;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        padding: 16px;
+        border-radius: 14px;
+        cursor: pointer;
+    }
+
+    .privacy-card button:disabled { opacity: 0.5; cursor: wait; }
+
+    .error-note {
+        display: none;
+        padding: 12px 14px;
+        background: rgba(255, 71, 87, 0.12);
+        border: 1px solid rgba(255, 71, 87, 0.4);
+        border-radius: 10px;
+        color: #ff8a95;
+        font-size: 0.78rem;
+        line-height: 1.5;
+        margin-bottom: 18px;
+        text-align: center;
+    }
+
+    .error-note.show { display: block; }
+
+    .step-note {
+        display: none;
+        padding: 10px 14px;
+        background: var(--accent-glow);
+        border: 1px solid var(--accent);
+        border-radius: 10px;
+        color: var(--accent);
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.72rem;
+        text-align: center;
+        margin-bottom: 18px;
+        letter-spacing: 0.05em;
+    }
+
+    .step-note.show { display: block; }
+
+    footer {
+        text-align: center;
+        padding: 22px 20px 26px;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.7rem;
+        color: var(--text-dim);
+        line-height: 1.8;
+    }
+
+    footer .dot { margin: 0 6px; opacity: 0.5; }
+
+    @media (max-width: 860px) {
+        header { padding: 14px 18px; }
+        .logo { font-size: 1.2rem; }
+        .status-pill { font-size: 0.62rem; padding: 5px 10px; }
+        main { grid-template-columns: 1fr; padding: 14px 16px 0; gap: 14px; }
+        .gesture-panel { padding: 20px 16px; }
+        .gesture-emoji { font-size: 3.4rem; }
+        .recording-timer { font-size: 1.8rem; }
+        .notes-panel { padding: 16px; }
+        .note-item { width: 165px; }
+        .hand-preview { width: 120px; height: 90px; bottom: 14px; right: 14px; }
+        .hand-preview-label { font-size: 0.42rem; bottom: 4px; left: 8px; }
+        footer { font-size: 0.62rem; padding: 16px 12px 20px; }
+        .toast { top: 68px; font-size: 0.78rem; padding: 10px 18px; }
+    }
+</style>
+</head>
+<body class="theme-sunset">
+
+<header>
+    <div class="logo">vocal<span>88</span></div>
+    <div class="header-right">
+        <div class="status-pill" id="statusPill">
+            <span class="status-dot"></span>
+            <span id="statusText">Loading</span>
+        </div>
+        <div class="theme-toggle">
+            <button class="theme-btn active" data-theme="sunset" title="Sunset">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="4"/>
+                    <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+                </svg>
+            </button>
+            <button class="theme-btn" data-theme="tropical" title="Tropical">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 21V11"/>
+                    <path d="M12 11C9 8 5 8 3 10c3 1 6 1 9 1z"/>
+                    <path d="M12 11c3-3 7-3 9-1-3 1-6 1-9 1z"/>
+                    <path d="M12 11c0-4 1-6 3-7-1 3-2 5-3 7z"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+</header>
+
+<main>
+    <section class="gesture-panel">
+        <div class="hold-bar" id="holdBar"></div>
+        <div class="gesture-display">
+            <div class="gesture-emoji" id="gestureEmoji">👋</div>
+            <div class="gesture-name" id="gestureName">SHOW YOUR HAND</div>
+            <div class="gesture-hint" id="gestureHint">Show an open palm to start recording.</div>
+            <div class="recording-timer" id="recordingTimer">00:00</div>
+        </div>
+
+        <div class="guide">
+            <div class="guide-title">Gesture Guide</div>
+            <div class="guide-row" data-gesture="OPEN_PALM">
+                <span class="guide-emoji">✋</span>
+                <span class="guide-text">Open palm → start recording</span>
+                <span class="guide-count">5</span>
+            </div>
+            <div class="guide-row" data-gesture="FIST">
+                <span class="guide-emoji">✊</span>
+                <span class="guide-text">Fist → stop &amp; save</span>
+                <span class="guide-count">0</span>
+            </div>
+            <div class="guide-row" data-gesture="INDEX">
+                <span class="guide-emoji">☝️</span>
+                <span class="guide-text">One finger → play selected</span>
+                <span class="guide-count">1</span>
+            </div>
+            <div class="guide-row" data-gesture="VICTORY">
+                <span class="guide-emoji">✌️</span>
+                <span class="guide-text">Two fingers → next card →</span>
+                <span class="guide-count">2</span>
+            </div>
+            <div class="guide-row" data-gesture="THREE">
+                <span class="guide-emoji">🤟</span>
+                <span class="guide-text">Three fingers → ← previous</span>
+                <span class="guide-count">3</span>
+            </div>
+            <div class="guide-row" data-gesture="PINCH">
+                <span class="guide-emoji">🤏</span>
+                <span class="guide-text">Pinch → delete selected</span>
+                <span class="guide-count">●</span>
+            </div>
+
+            <div class="guide-divider"></div>
+            <div class="guide-subtitle">File Actions</div>
+
+            <div class="guide-row" data-gesture="ROCK">
+                <span class="guide-emoji">🤘</span>
+                <span class="guide-text">Rock → download selected ⬇</span>
+                <span class="guide-count">⬇</span>
+            </div>
+            <div class="guide-row" data-gesture="SHAKA">
+                <span class="guide-emoji">🤙</span>
+                <span class="guide-text">Shaka → share selected ↗</span>
+                <span class="guide-count">↗</span>
+            </div>
+        </div>
+    </section>
+
+    <section class="notes-panel">
+        <div class="notes-header">
+            <h2>Voice Notes</h2>
+            <div class="notes-nav">
+                <button class="nav-btn" id="prevBtn">‹</button>
+                <span class="notes-count-badge" id="notesCount">0</span>
+                <button class="nav-btn" id="nextBtn">›</button>
+            </div>
+        </div>
+        <div class="notes-list" id="notesList">
+            <div class="empty-state">
+                <span class="big-emoji">🎙️</span>
+                No voice notes yet.<br>
+                Show an open palm to start recording.
+            </div>
+        </div>
+    </section>
+</main>
+
+<footer>
+    Copyright © 2026 <span class="dot">·</span> MC88 <span class="dot">·</span> mohamed005cheikh@gmail.com
+</footer>
+
+<div class="hand-preview">
+    <canvas id="handCanvas" width="400" height="300"></canvas>
+    <div class="hand-preview-label" id="skeletonLabel">HAND</div>
+</div>
+
+<div class="toast" id="toast">
+    <span class="toast-icon" id="toastIcon">✓</span>
+    <span id="toastText">Message</span>
+</div>
+
+<video id="cam" autoplay playsinline muted style="display:none"></video>
+
+<div class="privacy-overlay" id="privacyOverlay">
+    <div class="privacy-card">
+        <div class="privacy-icon">◐</div>
+        <h2>Your Privacy</h2>
+        <div class="step-note" id="stepNote"></div>
+        <div class="error-note" id="errorNote"></div>
+        <ul>
+            <li>Camera runs <span class="hl">only on your device</span> to read hand gestures.</li>
+            <li>You will only see a <span class="hl">hand skeleton preview</span>, not yourself.</li>
+            <li>Audio notes are stored <span class="hl">locally in your browser</span> (IndexedDB).</li>
+            <li>MP3 conversion happens <span class="hl">inside your browser</span>, no upload.</li>
+            <li>This site has <span class="hl">no backend server</span>. Source code is open.</li>
+        </ul>
+        <button id="privacyOk">Enter vocal88</button>
+    </div>
+</div>
+
+<script type="module">
+    import { HandLandmarker, FilesetResolver } from
+        'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/+esm';
+
+    const statusPill    = document.getElementById('statusPill');
+    const statusText    = document.getElementById('statusText');
+    const gestureEmoji  = document.getElementById('gestureEmoji');
+    const gestureName   = document.getElementById('gestureName');
+    const gestureHint   = document.getElementById('gestureHint');
+    const holdBar       = document.getElementById('holdBar');
+    const recTimer      = document.getElementById('recordingTimer');
+    const notesList     = document.getElementById('notesList');
+    const notesCount    = document.getElementById('notesCount');
+    const camVideo      = document.getElementById('cam');
+    const guideRows     = document.querySelectorAll('.guide-row');
+    const themeBtns     = document.querySelectorAll('.theme-btn');
+    const handCanvas    = document.getElementById('handCanvas');
+    const skeletonLabel = document.getElementById('skeletonLabel');
+    const prevBtn       = document.getElementById('prevBtn');
+    const nextBtn       = document.getElementById('nextBtn');
+    const privacyOv     = document.getElementById('privacyOverlay');
+    const privacyOk     = document.getElementById('privacyOk');
+    const errorNote     = document.getElementById('errorNote');
+    const stepNote      = document.getElementById('stepNote');
+    const toastEl       = document.getElementById('toast');
+    const toastIcon     = document.getElementById('toastIcon');
+    const toastText     = document.getElementById('toastText');
+    const ctx           = handCanvas.getContext('2d');
+
+    let lastHandData = null;
+    let notes = [];
+    let selectedIdx = 0;
+    let currentAudio = null;
+    let currentAudioUrl = null;
+    let mediaRecorder = null;
+    let mediaStream = null;
+    let audioChunks = [];
+    let recStartTime = 0;
+    let recTimerHandle = null;
+    let appState = 'IDLE';
+
+    // ===== helpers =====
+    function fmtDuration(ms) {
+        const s = Math.floor(ms / 1000);
+        const m = Math.floor(s / 60);
+        const ss = (s % 60).toString().padStart(2, '0');
+        return `${m.toString().padStart(2, '0')}:${ss}`;
+    }
+
+    function fmtDate(ts) {
+        return new Date(ts).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+    }
+
+    function fmtFileStamp(ts) {
+        const d = new Date(ts);
+        const pad = n => String(n).padStart(2, '0');
+        return `${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}-${pad(d.getHours())}${pad(d.getMinutes())}${pad(d.getSeconds())}`;
+    }
+
+    function setStatus(text, mode = '') {
+        statusText.textContent = text;
+        statusPill.className = 'status-pill' + (mode ? ' ' + mode : '');
+    }
+
+    function setStep(text) {
+        if (text) { stepNote.textContent = text; stepNote.classList.add('show'); }
+        else stepNote.classList.remove('show');
+    }
+
+    function setError(text) {
+        if (text) { errorNote.textContent = text; errorNote.classList.add('show'); }
+        else errorNote.classList.remove('show');
+    }
+
+    let toastTimer = null;
+    function showToast(text, icon = '✓', duration = 2200) {
+        toastIcon.textContent = icon;
+        toastText.textContent = text;
+        toastEl.classList.add('show');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => toastEl.classList.remove('show'), duration);
+    }
+
+    function readVar(name) {
+        return getComputedStyle(document.body).getPropertyValue(name).trim();
+    }
+
+    // ===== tiny tone generator =====
+    let audioCtx = null;
+    function initAudio() {
+        if (audioCtx) return;
+        try {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        } catch (e) { console.warn('Audio unavailable', e); }
+    }
+
+    function tone(freq, duration, vol, type, delay) {
+        if (!audioCtx) return;
+        const start = audioCtx.currentTime + (delay || 0);
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type || 'sine';
+        osc.frequency.setValueAtTime(freq, start);
+        gain.gain.setValueAtTime(0.0001, start);
+        gain.gain.exponentialRampToValueAtTime(vol, start + 0.008);
+        gain.gain.exponentialRampToValueAtTime(0.0001, start + duration);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start(start);
+        osc.stop(start + duration + 0.02);
+    }
+
+    const sfx = {
+        ready:       () => { tone(440, 0.08, 0.05, 'sine', 0); tone(660, 0.09, 0.05, 'sine', 0.07); tone(880, 0.12, 0.05, 'sine', 0.15); },
+        error:       () => { tone(220, 0.18, 0.07, 'square', 0); tone(160, 0.25, 0.06, 'square', 0.14); },
+        recordStart: () => { tone(330, 0.1, 0.06, 'sine', 0); tone(440, 0.14, 0.05, 'sine', 0.08); },
+        recordStop:  () => { tone(880, 0.09, 0.06, 'sine', 0); tone(660, 0.1, 0.05, 'sine', 0.07); },
+        play:        () => { tone(550, 0.07, 0.05, 'triangle', 0); tone(770, 0.09, 0.045, 'triangle', 0.06); },
+        playEnd:     () => { tone(550, 0.06, 0.05, 'triangle', 0); tone(440, 0.07, 0.045, 'triangle', 0.06); },
+        delete:      () => { tone(1200, 0.03, 0.05, 'square', 0); tone(800, 0.05, 0.04, 'square', 0.035); },
+        next:        () => { tone(1400, 0.03, 0.035, 'sine', 0); tone(1800, 0.05, 0.03, 'sine', 0.035); },
+        prev:        () => { tone(1800, 0.03, 0.035, 'sine', 0); tone(1400, 0.05, 0.03, 'sine', 0.035); },
+        theme:       () => { tone(660, 0.08, 0.05, 'triangle', 0); tone(990, 0.12, 0.045, 'triangle', 0.07); },
+        holdTick:    (p) => { tone(800 + p * 900, 0.02, 0.015, 'sine', 0); },
+        fire:        () => { tone(1046, 0.08, 0.06, 'sine', 0); tone(1318, 0.1, 0.05, 'sine', 0.06); },
+        download:    () => { tone(660, 0.07, 0.05, 'triangle', 0); tone(880, 0.08, 0.045, 'triangle', 0.07); tone(1174, 0.12, 0.045, 'triangle', 0.14); },
+        share:       () => { tone(880, 0.07, 0.05, 'sine', 0); tone(1174, 0.09, 0.045, 'sine', 0.06); tone(1568, 0.13, 0.04, 'sine', 0.14); }
+    };
+
+    // ===== indexeddb =====
+    const DB_NAME = 'vocal88', STORE = 'notes';
+
+    function openDB() {
+        return new Promise((res, rej) => {
+            const req = indexedDB.open(DB_NAME, 1);
+            req.onupgradeneeded = e => {
+                const db = e.target.result;
+                if (!db.objectStoreNames.contains(STORE)) db.createObjectStore(STORE, { keyPath: 'id' });
+            };
+            req.onsuccess = () => res(req.result);
+            req.onerror = () => rej(req.error);
+        });
+    }
+
+    async function dbAdd(note) {
+        const db = await openDB();
+        return new Promise((res, rej) => {
+            const tx = db.transaction(STORE, 'readwrite');
+            tx.objectStore(STORE).put(note).onsuccess = () => res();
+            tx.onerror = () => rej(tx.error);
+        });
+    }
+
+    async function dbGetAll() {
+        const db = await openDB();
+        return new Promise((res, rej) => {
+            const tx = db.transaction(STORE, 'readonly');
+            const req = tx.objectStore(STORE).getAll();
+            req.onsuccess = () => res((req.result || []).sort((a, b) => b.timestamp - a.timestamp));
+            req.onerror = () => rej(req.error);
+        });
+    }
+
+    async function dbDelete(id) {
+        const db = await openDB();
+        return new Promise((res, rej) => {
+            const tx = db.transaction(STORE, 'readwrite');
+            tx.objectStore(STORE).delete(id).onsuccess = () => res();
+            tx.onerror = () => rej(tx.error);
+        });
+    }
+
+    // ===== theme =====
+    const THEME_KEY = 'vocal88_theme';
+
+    function setTheme(name) {
+        document.body.className = 'theme-' + name;
+        themeBtns.forEach(b => b.classList.toggle('active', b.dataset.theme === name));
+        localStorage.setItem(THEME_KEY, name);
+        drawHandSkeleton(lastHandData);
+    }
+
+    themeBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            setTheme(btn.dataset.theme);
+            sfx.theme();
+        });
+    });
+
+    const savedTheme = localStorage.getItem(THEME_KEY);
+    if (savedTheme === 'tropical' || savedTheme === 'sunset') setTheme(savedTheme);
+
+    // ===== skeleton =====
+    const HAND_CONNECTIONS = [
+        [0,1],[1,2],[2,3],[3,4],[0,5],[5,6],[6,7],[7,8],
+        [0,9],[9,10],[10,11],[11,12],[0,13],[13,14],[14,15],[15,16],
+        [0,17],[17,18],[18,19],[19,20],[5,9],[9,13],[13,17]
+    ];
+
+    function drawHandSkeleton(hand) {
+        const w = handCanvas.width, h = handCanvas.height;
+        const bg = readVar('--card') || '#111';
+        const accent = readVar('--accent') || '#f59e0b';
+        const dim = readVar('--text-dim') || '#888';
+
+        ctx.fillStyle = bg;
+        ctx.fillRect(0, 0, w, h);
+
+        if (!hand) {
+            ctx.fillStyle = dim;
+            ctx.font = 'bold 18px monospace';
+            ctx.globalAlpha = 0.5;
+            ctx.textAlign = 'center';
+            ctx.fillText('NO HAND', w / 2, h / 2 + 6);
+            ctx.globalAlpha = 1;
+            return;
+        }
+
+        const points = hand.map(p => ({ x: (1 - p.x) * w, y: p.y * h }));
+
+        ctx.strokeStyle = accent;
+        ctx.lineWidth = 5;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        ctx.globalAlpha = 0.9;
+
+        HAND_CONNECTIONS.forEach(([a, b]) => {
+            ctx.beginPath();
+            ctx.moveTo(points[a].x, points[a].y);
+            ctx.lineTo(points[b].x, points[b].y);
+            ctx.stroke();
+        });
+
+        ctx.fillStyle = accent;
+        ctx.globalAlpha = 1;
+        points.forEach((p, i) => {
+            const r = (i === 8 || i === 4) ? 9 : (i === 0 ? 8 : 5.5);
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
+            ctx.fill();
+        });
+    }
+
+    // ===== notes rendering =====
+    function renderNotes() {
+        notesCount.textContent = notes.length;
+        notesList.innerHTML = '';
+
+        if (notes.length === 0) {
+            notesList.innerHTML = `
+                <div class="empty-state">
+                    <span class="big-emoji">🎙️</span>
+                    No voice notes yet.<br>
+                    Show an open palm to start recording.
+                </div>`;
+            return;
+        }
+
+        notes.forEach((note, idx) => {
+            const item = document.createElement('div');
+            item.className = 'note-item';
+            if (idx === selectedIdx) item.classList.add('selected');
+
+            const isPlaying = currentAudio && currentAudio.dataset.id === note.id;
+            if (isPlaying) item.classList.add('playing');
+
+            const bars = Array.from({ length: 20 }, (_, i) => {
+                const h = 8 + Math.abs(Math.sin((i + note.timestamp * 0.0001) * 0.9)) * 42;
+                return `<span style="height:${h}px"></span>`;
+            }).join('');
+
+            item.innerHTML = `
+                <div class="note-head">
+                    <div class="note-play">${isPlaying ? '❚❚' : '▶'}</div>
+                    <div class="note-actions">
+                        <button class="note-download" title="Download MP3">⬇</button>
+                        <button class="note-share" title="Share MP3">↗</button>
+                        <button class="note-delete" title="Delete">✕</button>
+                    </div>
+                </div>
+                <div class="note-wave">${bars}</div>
+                <div class="note-meta">${fmtDuration(note.duration)} · ${fmtDate(note.timestamp)}</div>
+            `;
+
+            item.querySelector('.note-play').addEventListener('click', e => {
+                e.stopPropagation();
+                if (isPlaying) stopPlayback();
+                else playNote(note);
+            });
+            item.querySelector('.note-download').addEventListener('click', async e => {
+                e.stopPropagation();
+                await downloadNote(note);
+            });
+            item.querySelector('.note-share').addEventListener('click', async e => {
+                e.stopPropagation();
+                await shareNote(note);
+            });
+            item.querySelector('.note-delete').addEventListener('click', async e => {
+                e.stopPropagation();
+                await removeNote(note.id);
+            });
+            item.addEventListener('click', () => {
+                selectedIdx = idx;
+                renderNotes();
+            });
+
+            notesList.appendChild(item);
+        });
+
+        const selected = notesList.querySelector('.note-item.selected');
+        if (selected) selected.scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'smooth' });
+    }
+
+    // ===== recording =====
+    async function startRecording() {
+        if (appState !== 'IDLE') return;
+        try {
+            mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            const mime = MediaRecorder.isTypeSupported('audio/webm;codecs=opus') ? 'audio/webm;codecs=opus' : 'audio/webm';
+            mediaRecorder = new MediaRecorder(mediaStream, { mimeType: mime });
+            audioChunks = [];
+            mediaRecorder.ondataavailable = e => { if (e.data.size > 0) audioChunks.push(e.data); };
+            mediaRecorder.onstop = onRecordingStopped;
+            mediaRecorder.start();
+
+            appState = 'RECORDING';
+            recStartTime = Date.now();
+            setStatus('Recording', 'recording');
+            gestureEmoji.textContent = '🔴';
+            gestureName.textContent = 'RECORDING';
+            gestureHint.textContent = 'Close your fist to stop and save.';
+            recTimer.classList.add('active');
+            sfx.recordStart();
+            recTimerHandle = setInterval(() => {
+                recTimer.textContent = fmtDuration(Date.now() - recStartTime);
+            }, 200);
+        } catch (err) {
+            console.error(err);
+            setStatus('Mic denied', 'error');
+            gestureHint.textContent = 'Microphone permission was denied.';
+            showToast('Microphone permission denied', '⚠️', 3000);
+            sfx.error();
+        }
+    }
+
+    function stopRecording() {
+        if (appState !== 'RECORDING' || !mediaRecorder) return;
+        mediaRecorder.stop();
+        if (mediaStream) {
+            mediaStream.getTracks().forEach(t => t.stop());
+            mediaStream = null;
+        }
+        clearInterval(recTimerHandle);
+        recTimer.classList.remove('active');
+        recTimer.textContent = '00:00';
+        sfx.recordStop();
+    }
+
+    async function onRecordingStopped() {
+        const duration = Date.now() - recStartTime;
+        resetToIdle();
+        if (audioChunks.length === 0 || duration < 400) return;
+
+        const blob = new Blob(audioChunks, { type: 'audio/webm' });
+        const note = { id: 'n_' + Date.now(), blob, duration, timestamp: Date.now() };
+        try {
+            await dbAdd(note);
+            notes.unshift(note);
+            selectedIdx = 0;
+            renderNotes();
+            showToast('Note saved', '✓', 1800);
+        } catch (err) { console.error(err); }
+    }
+
+    // ===== playback =====
+    function haltAudio(silent) {
+        if (currentAudio) {
+            try {
+                currentAudio.onended = null;
+                currentAudio.onerror = null;
+                currentAudio.pause();
+            } catch (e) {}
+            currentAudio = null;
+        }
+        if (currentAudioUrl) {
+            URL.revokeObjectURL(currentAudioUrl);
+            currentAudioUrl = null;
+        }
+        if (!silent) sfx.playEnd();
+    }
+
+    function playNote(note) {
+        haltAudio(true);
+        currentAudioUrl = URL.createObjectURL(note.blob);
+        const audio = new Audio(currentAudioUrl);
+        currentAudio = audio;
+        currentAudio.dataset.id = note.id;
+
+        appState = 'PLAYING';
+        setStatus('Playing', 'playing');
+        gestureEmoji.textContent = '🔊';
+        gestureName.textContent = 'PLAYING';
+        gestureHint.textContent = 'It stops by itself at the end.';
+        sfx.play();
+
+        audio.onended = () => { haltAudio(true); sfx.playEnd(); resetToIdle(); renderNotes(); };
+        audio.onerror = () => { haltAudio(true); resetToIdle(); renderNotes(); };
+        audio.play().catch(err => {
+            console.error(err);
+            haltAudio(true);
+            resetToIdle();
+            renderNotes();
+        });
+
+        renderNotes();
+    }
+
+    function stopPlayback() {
+        haltAudio(false);
+        resetToIdle();
+        renderNotes();
+    }
+
+    async function removeNote(id) {
+        if (currentAudio && currentAudio.dataset.id === id) {
+            haltAudio(true);
+            resetToIdle();
+        }
+        await dbDelete(id);
+        notes = notes.filter(n => n.id !== id);
+        if (selectedIdx >= notes.length) selectedIdx = Math.max(0, notes.length - 1);
+        sfx.delete();
+        renderNotes();
+    }
+
+    function navigate(delta) {
+        if (notes.length === 0) return;
+        const before = selectedIdx;
+        selectedIdx = Math.max(0, Math.min(notes.length - 1, selectedIdx + delta));
+        if (selectedIdx !== before) {
+            if (delta > 0) sfx.next();
+            else sfx.prev();
+        }
+        renderNotes();
+    }
+
+    prevBtn.addEventListener('click', () => navigate(-1));
+    nextBtn.addEventListener('click', () => navigate(1));
+
+    function resetToIdle() {
+        appState = 'IDLE';
+        setStatus('Ready');
+        gestureEmoji.textContent = '👋';
+        gestureName.textContent = 'SHOW YOUR HAND';
+        gestureHint.textContent = 'Show an open palm to start recording.';
+    }
+
+    // =====================================================
+    // ===== MP3 conversion (lamejs, loaded on demand) =====
+    // =====================================================
+    let lamejsPromise = null;
+
+    function loadLamejs() {
+        if (lamejsPromise) return lamejsPromise;
+        lamejsPromise = new Promise((resolve, reject) => {
+            if (window.lamejs) return resolve(window.lamejs);
+            const script = document.createElement('script');
+            script.src = 'https://cdn.jsdelivr.net/npm/lamejs@1.2.1/lame.min.js';
+            script.onload = () => {
+                if (window.lamejs) resolve(window.lamejs);
+                else reject(new Error('lamejs failed to expose global'));
+            };
+            script.onerror = () => reject(new Error('Failed to load lamejs'));
+            document.head.appendChild(script);
+        });
+        return lamejsPromise;
+    }
+
+    // Decode WebM → PCM → encode MP3.
+    // onProgress(p) where p goes from 0..1
+    async function blobToMp3(webmBlob, onProgress) {
+        const lamejs = await loadLamejs();
+
+        // 1) Decode WebM/Opus to raw PCM via AudioContext
+        const arrayBuffer = await webmBlob.arrayBuffer();
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        const decodeCtx = new AudioCtx();
+        let audioBuffer;
+        try {
+            // slice(0) to avoid Safari detaching the original buffer
+            audioBuffer = await decodeCtx.decodeAudioData(arrayBuffer.slice(0));
+        } finally {
+            try { await decodeCtx.close(); } catch (e) {}
+        }
+
+        const channels = audioBuffer.numberOfChannels;
+        const sampleRate = audioBuffer.sampleRate;
+        const length = audioBuffer.length;
+
+        // 2) Mix down to mono Float32
+        let mono;
+        if (channels === 1) {
+            mono = audioBuffer.getChannelData(0);
+        } else {
+            const left = audioBuffer.getChannelData(0);
+            const right = audioBuffer.getChannelData(1);
+            mono = new Float32Array(length);
+            for (let i = 0; i < length; i++) mono[i] = (left[i] + right[i]) * 0.5;
+        }
+
+        // 3) Float32 → Int16 PCM
+        const pcm = new Int16Array(length);
+        for (let i = 0; i < length; i++) {
+            const s = Math.max(-1, Math.min(1, mono[i]));
+            pcm[i] = s < 0 ? s * 0x8000 : s * 0x7FFF;
+        }
+
+        // 4) Encode with lamejs (mono, 128 kbps — voice-grade, small size)
+        const kbps = 128;
+        const encoder = new lamejs.Mp3Encoder(1, sampleRate, kbps);
+        const blockSize = 1152;
+        const chunks = [];
+        const totalBlocks = Math.ceil(pcm.length / blockSize);
+
+        for (let i = 0, block = 0; i < pcm.length; i += blockSize, block++) {
+            const slice = pcm.subarray(i, Math.min(i + blockSize, pcm.length));
+            const buf = encoder.encodeBuffer(slice);
+            if (buf.length > 0) chunks.push(new Uint8Array(buf));
+            if (onProgress && (block % 40 === 0)) {
+                onProgress(block / totalBlocks);
+            }
+        }
+        const tail = encoder.flush();
+        if (tail.length > 0) chunks.push(new Uint8Array(tail));
+
+        if (onProgress) onProgress(1);
+        return new Blob(chunks, { type: 'audio/mp3' });
+    }
+
+    // ===== download (MP3) =====
+    async function downloadNote(note) {
+        if (!note) { showToast('Select a note first', 'ℹ️', 1800); return; }
+        if (appState !== 'IDLE') return;
+
+        try {
+            setStatus('Converting…', 'converting');
+            showToast('Converting to MP3…', '🎵', 2400);
+            gestureEmoji.textContent = '🎵';
+            gestureName.textContent = 'CONVERTING';
+            gestureHint.textContent = 'Making a shareable MP3…';
+
+            const mp3Blob = await blobToMp3(note.blob);
+            const filename = `vocal88-${fmtFileStamp(note.timestamp)}.mp3`;
+
+            const url = URL.createObjectURL(mp3Blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.rel = 'noopener';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            setTimeout(() => URL.revokeObjectURL(url), 5000);
+
+            sfx.download();
+            showToast('Saved as MP3', '⬇', 1800);
+            setStatus('Downloaded', 'downloading');
+            gestureEmoji.textContent = '⬇️';
+            gestureName.textContent = 'DOWNLOADED';
+            gestureHint.textContent = 'MP3 saved to your device.';
+            setTimeout(() => {
+                if (appState === 'IDLE') resetToIdle();
+            }, 1600);
+        } catch (err) {
+            console.error('MP3 conversion failed:', err);
+            sfx.error();
+            showToast('Conversion failed', '⚠️', 2200);
+            setStatus('Ready');
+            resetToIdle();
+        }
+    }
+
+    // ===== share (MP3, native sheet) =====
+    async function shareNote(note) {
+        if (!note) { showToast('Select a note first', 'ℹ️', 1800); return; }
+        if (appState !== 'IDLE') return;
+
+        // 1) Convert to MP3 first — MP3 is accepted by mobile share sheets
+        let mp3Blob;
+        try {
+            setStatus('Converting…', 'converting');
+            showToast('Preparing MP3…', '🎵', 2400);
+            gestureEmoji.textContent = '🎵';
+            gestureName.textContent = 'CONVERTING';
+            gestureHint.textContent = 'Building shareable file…';
+            mp3Blob = await blobToMp3(note.blob);
+        } catch (err) {
+            console.error('MP3 conversion failed:', err);
+            sfx.error();
+            showToast('Conversion failed', '⚠️', 2200);
+            setStatus('Ready');
+            resetToIdle();
+            return;
+        }
+
+        const filename = `vocal88-${fmtFileStamp(note.timestamp)}.mp3`;
+        const file = new File([mp3Blob], filename, { type: 'audio/mp3' });
+
+        // 2) Try native share sheet
+        if (typeof navigator.share !== 'function') {
+            showToast('Share not supported — downloading', '⬇', 2600);
+            return downloadBlobAsFile(mp3Blob, filename, true);
+        }
+
+        // Some browsers throw synchronously if files aren't allowed.
+        let canShareFiles = true;
+        if (typeof navigator.canShare === 'function') {
+            try { canShareFiles = navigator.canShare({ files: [file] }); }
+            catch (e) { canShareFiles = false; }
+        }
+
+        if (!canShareFiles) {
+            // Fall back to download but tell the user why
+            showToast('Browser blocked file share — saved to Downloads', '⬇', 3000);
+            return downloadBlobAsFile(mp3Blob, filename, true);
+        }
+
+        try {
+            sfx.share();
+            setStatus('Sharing', 'sharing');
+            gestureEmoji.textContent = '↗️';
+            gestureName.textContent = 'SHARE';
+            gestureHint.textContent = 'Choose an app…';
+
+            await navigator.share({
+                files: [file],
+                title: 'Vocal88 Note',
+                text: 'Voice note recorded with Vocal88'
+            });
+
+            showToast('Shared', '↗', 1600);
+            setStatus('Ready');
+            resetToIdle();
+        } catch (err) {
+            if (err && err.name === 'AbortError') {
+                // user cancelled — silent
+                setStatus('Ready');
+                resetToIdle();
+                return;
+            }
+            console.error('Share failed:', err);
+            showToast('Share failed — saved to Downloads', '⬇', 3000);
+            downloadBlobAsFile(mp3Blob, filename, true);
+            setStatus('Ready');
+            resetToIdle();
+        }
+    }
+
+    // Shared low-level download helper
+    function downloadBlobAsFile(blob, filename, notify) {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        a.rel = 'noopener';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(() => URL.revokeObjectURL(url), 5000);
+        if (notify) {
+            sfx.download();
+            showToast('Saved to Downloads', '⬇', 2000);
+        }
+    }
+
+    // ===== gesture detection =====
+    function fingerExtended(hand, tipIdx, pipIdx) {
+        const wrist = hand[0];
+        const tipD = Math.hypot(hand[tipIdx].x - wrist.x, hand[tipIdx].y - wrist.y);
+        const pipD = Math.hypot(hand[pipIdx].x - wrist.x, hand[pipIdx].y - wrist.y);
+        return tipD > pipD * 1.05;
+    }
+
+    function thumbExtended(hand) {
+        const wrist = hand[0];
+        const thumbTip = hand[4];
+        const thumbMcp = hand[2];
+        const indexMcp = hand[5];
+
+        const palmSize = Math.hypot(wrist.x - indexMcp.x, wrist.y - indexMcp.y) || 0.001;
+        const tipFromIndex = Math.hypot(thumbTip.x - indexMcp.x, thumbTip.y - indexMcp.y);
+        const mcpFromIndex = Math.hypot(thumbMcp.x - indexMcp.x, thumbMcp.y - indexMcp.y);
+
+        return tipFromIndex > mcpFromIndex * 1.15 && (tipFromIndex / palmSize) > 0.55;
+    }
+
+    function detectGesture(hand) {
+        const idx  = fingerExtended(hand, 8, 6);
+        const mid  = fingerExtended(hand, 12, 10);
+        const ring = fingerExtended(hand, 16, 14);
+        const pink = fingerExtended(hand, 20, 18);
+
+        const wrist = hand[0], midMcp = hand[9];
+        const handSize = Math.hypot(wrist.x - midMcp.x, wrist.y - midMcp.y) || 0.001;
+        const pinchDist = Math.hypot(
+            hand[8].x - hand[4].x,
+            hand[8].y - hand[4].y,
+            (hand[8].z || 0) - (hand[4].z || 0)
+        );
+        const pinchRatio = pinchDist / handSize;
+
+        if (!idx && !mid && !ring && !pink) {
+            return pinchRatio < 0.45 ? 'PINCH' : 'FIST';
+        }
+        if (idx && !mid && !ring && !pink) return 'INDEX';
+        if (idx && mid && !ring && !pink) return 'VICTORY';
+        if (idx && mid && ring && !pink) return 'THREE';
+        if (idx && mid && ring && pink) return 'OPEN_PALM';
+        if (idx && !mid && !ring && pink) return 'ROCK';
+        if (!idx && !mid && !ring && pink) return thumbExtended(hand) ? 'SHAKA' : null;
+        return null;
+    }
+
+    const HOLD_MS = {
+        OPEN_PALM: 800, FIST: 600, INDEX: 450, VICTORY: 400,
+        THREE: 400, PINCH: 500, ROCK: 700, SHAKA: 700
+    };
+    const COOLDOWN_MS = {
+        OPEN_PALM: 1500, FIST: 1200, INDEX: 800, VICTORY: 600,
+        THREE: 600, PINCH: 2000, ROCK: 1500, SHAKA: 1500
+    };
+    const STABLE_FRAMES = 3;
+    const TRANSITION_LOCK_MS = 280;
+
+    const GESTURE_INFO = {
+        OPEN_PALM:  { emoji: '✋', name: 'OPEN PALM',     hint: 'Hold to start recording' },
+        FIST:       { emoji: '✊', name: 'FIST',          hint: 'Hold to stop and save' },
+        INDEX:      { emoji: '☝️', name: 'ONE FINGER',    hint: 'Hold to play the selected note' },
+        VICTORY:    { emoji: '✌️', name: 'TWO FINGERS',   hint: 'Hold to go to the next card →' },
+        THREE:      { emoji: '🤟', name: 'THREE FINGERS', hint: 'Hold to go back ←' },
+        PINCH:      { emoji: '🤏', name: 'PINCH',         hint: 'Hold to delete the selected note' },
+        ROCK:       { emoji: '🤘', name: 'ROCK',          hint: 'Hold to download the selected note ⬇' },
+        SHAKA:      { emoji: '🤙', name: 'SHAKA',         hint: 'Hold to share the selected note ↗' }
+    };
+
+    let currentGesture = null, candidateGesture = null, candidateFrames = 0;
+    let gestureStart = 0, lockedUntil = 0;
+    let lastHoldTickBucket = -1;
+    const lastFired = {};
+
+    function updateGuide(g) {
+        guideRows.forEach(row => row.classList.toggle('active', row.dataset.gesture === g));
+    }
+
+    function updateGestureUI(g) {
+        if (g === currentGesture) return;
+        currentGesture = g;
+        gestureStart = performance.now();
+        lastHoldTickBucket = -1;
+        updateGuide(g);
+
+        if (g && GESTURE_INFO[g] && appState === 'IDLE') {
+            const info = GESTURE_INFO[g];
+            gestureEmoji.textContent = info.emoji;
+            gestureName.textContent = info.name;
+            gestureHint.textContent = info.hint;
+        } else if (!g && appState === 'IDLE') {
+            gestureEmoji.textContent = '👋';
+            gestureName.textContent = 'SHOW YOUR HAND';
+            gestureHint.textContent = 'Show an open palm to start recording.';
+        }
+    }
+
+    function fireGesture(g) {
+        const now = performance.now();
+        if (now - (lastFired[g] || 0) < (COOLDOWN_MS[g] || 500)) return;
+        lastFired[g] = now;
+        lockedUntil = now + TRANSITION_LOCK_MS;
+        sfx.fire();
+
+        switch (g) {
+            case 'OPEN_PALM':
+                if (appState === 'IDLE') startRecording();
+                break;
+            case 'FIST':
+                if (appState === 'RECORDING') stopRecording();
+                break;
+            case 'INDEX': {
+                if (appState === 'RECORDING') break;
+                const note = notes[selectedIdx];
+                if (note) playNote(note);
+                break;
+            }
+            case 'VICTORY':
+                if (appState !== 'RECORDING') navigate(1);
+                break;
+            case 'THREE':
+                if (appState !== 'RECORDING') navigate(-1);
+                break;
+            case 'PINCH':
+                if (appState !== 'RECORDING' && notes[selectedIdx]) removeNote(notes[selectedIdx].id);
+                break;
+            case 'ROCK':
+                if (appState !== 'RECORDING') {
+                    const note = notes[selectedIdx];
+                    if (note) downloadNote(note);
+                    else showToast('Select a note to download', 'ℹ️', 1800);
+                }
+                break;
+            case 'SHAKA':
+                if (appState !== 'RECORDING') {
+                    const note = notes[selectedIdx];
+                    if (note) shareNote(note);
+                    else showToast('Select a note to share', 'ℹ️', 1800);
+                }
+                break;
+        }
+    }
+
+    guideRows.forEach(row => {
+        row.addEventListener('click', () => {
+            const g = row.dataset.gesture;
+            if (g) { sfx.fire(); fireGesture(g); }
+        });
+    });
+
+    // ===== hand tracking loop =====
+    let handLandmarker = null;
+    let lastVideoTime = -1, lastDetectTime = 0;
+    const DETECT_INTERVAL = 33;
+    let handTrackingActive = false;
+
+    function processHand(hand, now) {
+        const rawGesture = detectGesture(hand);
+
+        if (rawGesture === candidateGesture) candidateFrames++;
+        else { candidateGesture = rawGesture; candidateFrames = 1; }
+
+        const stable = candidateFrames >= STABLE_FRAMES ? rawGesture : null;
+        skeletonLabel.textContent = stable
+            ? (GESTURE_INFO[stable] ? GESTURE_INFO[stable].name : 'HAND')
+            : 'TRACKING';
+
+        if (now < lockedUntil) {
+            holdBar.style.width = '0%';
+            updateGestureUI(null);
+        } else {
+            updateGestureUI(stable);
+            if (stable) {
+                const holdNeeded = HOLD_MS[stable] || 500;
+                const progress = Math.min((now - gestureStart) / holdNeeded, 1);
+                holdBar.style.width = (progress * 100) + '%';
+
+                const bucket = Math.floor(progress * 8);
+                if (bucket !== lastHoldTickBucket && progress < 1) {
+                    lastHoldTickBucket = bucket;
+                    sfx.holdTick(progress);
+                }
+                if (progress >= 1) fireGesture(stable);
+            } else {
+                holdBar.style.width = '0%';
+            }
+        }
+    }
+
+    async function initHandTracking() {
+        setStep('Step 1/3 — Loading vision library…');
+        const vision = await FilesetResolver.forVisionTasks(
+            'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/wasm'
+        );
+
+        setStep('Step 2/3 — Loading hand model…');
+        handLandmarker = await HandLandmarker.createFromOptions(vision, {
+            baseOptions: {
+                modelAssetPath: 'https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task',
+                delegate: 'GPU'
+            },
+            runningMode: 'VIDEO',
+            numHands: 1
+        });
+
+        setStep('Step 3/3 — Asking for camera permission…');
+        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } });
+        camVideo.srcObject = stream;
+        await camVideo.play();
+
+        handTrackingActive = true;
+        setStep(null);
+        setStatus('Ready');
+        skeletonLabel.textContent = 'HAND';
+
+        function loop() {
+            requestAnimationFrame(loop);
+            if (!handTrackingActive) return;
+
+            const now = performance.now();
+            if (now - lastDetectTime < DETECT_INTERVAL) return;
+            lastDetectTime = now;
+
+            if (camVideo.readyState < 2) return;
+            if (camVideo.currentTime === lastVideoTime) return;
+            lastVideoTime = camVideo.currentTime;
+
+            const result = handLandmarker.detectForVideo(camVideo, now);
+
+            if (result.landmarks && result.landmarks.length > 0) {
+                const hand = result.landmarks[0];
+                lastHandData = hand;
+                processHand(hand, now);
+                drawHandSkeleton(hand);
+            } else {
+                lastHandData = null;
+                candidateGesture = null;
+                candidateFrames = 0;
+                holdBar.style.width = '0%';
+                updateGestureUI(null);
+                drawHandSkeleton(null);
+                skeletonLabel.textContent = 'NO HAND';
+            }
+        }
+        loop();
+    }
+
+    // ===== boot =====
+    privacyOk.addEventListener('click', async () => {
+        initAudio();
+        privacyOk.disabled = true;
+        privacyOk.textContent = 'Working…';
+        setError(null);
+
+        try {
+            await initHandTracking();
+            privacyOv.style.display = 'none';
+            sfx.ready();
+        } catch (err) {
+            console.error(err);
+            privacyOk.disabled = false;
+            privacyOk.textContent = 'Retry';
+
+            let msg = 'Failed: ' + (err.message || 'unknown') + ' (' + (err.name || '?') + ')';
+            if (err.name === 'NotAllowedError') {
+                msg = 'Camera permission denied. In Brave: lion icon → Site settings → Camera → Allow.';
+            } else if (err.name === 'NotFoundError') {
+                msg = 'No camera found on this device.';
+            } else if (err.name === 'NotReadableError') {
+                msg = 'Camera is being used by another app.';
+            }
+            setError(msg);
+            setStep(null);
+            setStatus('Camera error', 'error');
+            skeletonLabel.textContent = 'OFF';
+            sfx.error();
+        }
+    });
+
+    drawHandSkeleton(null);
+    setStatus('Awaiting input');
+
+    (async function init() {
+        try {
+            notes = await dbGetAll();
+            renderNotes();
+        } catch (err) { console.error(err); }
+    })();
+</script>
+
+</body>
+</html>
